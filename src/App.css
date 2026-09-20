@@ -1,0 +1,424 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background: #f8f7ff;
+  color: #242338;
+}
+
+button {
+  font-family: inherit;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+/* NAVBAR */
+
+.navbar {
+  height: 75px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border-bottom: 1px solid #eeeef5;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.logo span {
+  color: #7c5cff;
+}
+
+.nav-links {
+  display: flex;
+  gap: 35px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #666477;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  color: #7c5cff;
+}
+
+.profile {
+  border: none;
+  background: #f1efff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* HERO */
+
+.hero {
+  padding: 90px 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 50px;
+  background: linear-gradient(135deg, #f9f7ff, #eeeaff);
+}
+
+.tag {
+  color: #7c5cff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+.hero h1 {
+  font-size: 58px;
+  line-height: 1.05;
+  letter-spacing: -2px;
+}
+
+.hero h1 span {
+  color: #7c5cff;
+}
+
+.hero-text {
+  max-width: 580px;
+  margin: 25px 0;
+  color: #6c697c;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.primary-btn {
+  border: none;
+  padding: 15px 25px;
+  border-radius: 12px;
+  background: #7c5cff;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(124, 92, 255, 0.2);
+}
+
+.hero-card {
+  width: 330px;
+  padding: 40px;
+  border-radius: 25px;
+  background: white;
+  box-shadow: 0 20px 50px rgba(60, 50, 120, 0.1);
+  text-align: center;
+}
+
+.circle {
+  width: 90px;
+  height: 90px;
+  margin: auto auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #eeeaff;
+  font-size: 38px;
+}
+
+.hero-card h3 {
+  margin-bottom: 10px;
+}
+
+.hero-card p {
+  color: #777487;
+  line-height: 1.6;
+}
+
+/* SECTIONS */
+
+.section {
+  padding: 80px 7%;
+}
+
+.section-heading h2,
+.analytics-header h2,
+.prediction h2 {
+  font-size: 36px;
+}
+
+/* SECTORS */
+
+.sector-grid {
+  margin-top: 35px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.sector-card {
+  position: relative;
+  padding: 25px;
+  min-height: 180px;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.25s;
+  box-shadow: 0 10px 30px rgba(40, 35, 80, 0.05);
+}
+
+.sector-card:hover {
+  transform: translateY(-5px);
+}
+
+.sector-card.selected {
+  border-color: #7c5cff;
+}
+
+.sector-icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 27px;
+  margin-bottom: 20px;
+}
+
+.hospitality {
+  background: #ffe7ee;
+}
+
+.finance {
+  background: #e3f5e8;
+}
+
+.entertainment {
+  background: #eee7ff;
+}
+
+.retail {
+  background: #fff0d9;
+}
+
+.sector-card h3 {
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+
+.sector-card p {
+  color: #777487;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.arrow {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  color: #7c5cff;
+  font-weight: bold;
+}
+
+/* ANALYTICS */
+
+.analytics {
+  padding: 80px 7%;
+  background: #242338;
+  color: white;
+}
+
+.analytics-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.analytics-header .tag {
+  color: #b6a7ff;
+}
+
+.status {
+  color: #72e6a1;
+  font-size: 13px;
+}
+
+.stats-grid {
+  margin-top: 35px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.stat-card {
+  padding: 25px;
+  border-radius: 18px;
+  background: #302e49;
+}
+
+.stat-card span {
+  font-size: 25px;
+}
+
+.stat-card p {
+  color: #aaa7ba;
+  margin: 20px 0 8px;
+  font-size: 13px;
+}
+
+.stat-card h3 {
+  font-size: 28px;
+}
+
+.stat-card small {
+  color: #89869b;
+  font-size: 11px;
+}
+
+.insight-card {
+  margin-top: 20px;
+  padding: 30px;
+  border-radius: 20px;
+  background: #302e49;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.insight-card h3 {
+  margin-bottom: 10px;
+}
+
+.insight-card p:last-child {
+  color: #aaa7ba;
+  max-width: 800px;
+  line-height: 1.6;
+}
+
+.insight-icon {
+  font-size: 45px;
+}
+
+/* PREDICTION */
+
+.prediction {
+  padding: 80px 7%;
+}
+
+.prediction-grid {
+  margin-top: 35px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.prediction-grid div {
+  padding: 30px;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(40, 35, 80, 0.05);
+}
+
+.prediction-grid span {
+  font-size: 30px;
+}
+
+.prediction-grid h3 {
+  margin: 18px 0 10px;
+}
+
+.prediction-grid p {
+  color: #777487;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* FOOTER */
+
+footer {
+  padding: 35px 7%;
+  background: #f0eef9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+footer p {
+  color: #777487;
+  font-size: 13px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+  .nav-links {
+    display: none;
+  }
+
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero h1 {
+    font-size: 45px;
+  }
+
+  .sector-grid,
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .prediction-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .sector-grid,
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-card {
+    width: 100%;
+  }
+
+  footer {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .page-content {
+  padding: 40px;
+}
+
+.page-content h1 {
+  font-size: 32px;
+  color: #17251f;
+  margin-bottom: 10px;
+}
+
+.page-content p {
+  color: #718078;
+  font-size: 17px;
+}
+}
