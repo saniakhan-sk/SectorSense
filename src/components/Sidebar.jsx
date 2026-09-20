@@ -1,187 +1,98 @@
-import { NavLink, useNavigate, useParams } from "react-router-dom";
-import "./Sidebar.css";
+import React from "react";
 
-function Sidebar() {
-  const navigate = useNavigate();
-  const { sector } = useParams();
+const sectorData = {
+  Retail: {
+    icon: "🛍️",
+    menus: [
+      ["📊", "Overview"],
+      ["📈", "Sales"],
+      ["👥", "Customers"],
+      ["📦", "Inventory"],
+      ["⚠️", "Alerts"],
+    ],
+  },
 
-  const sectorData = {
-    retail: {
-      name: "Retail",
-      icon: "🛍️",
-    },
+  Hospitality: {
+    icon: "🏨",
+    menus: [
+      ["📊", "Overview"],
+      ["🛏️", "Bookings"],
+      ["👥", "Guests"],
+      ["⭐", "Services"],
+      ["⚠️", "Alerts"],
+    ],
+  },
 
-    hospitality: {
-      name: "Hospitality",
-      icon: "🏨",
-    },
+  Finance: {
+    icon: "💳",
+    menus: [
+      ["📊", "Overview"],
+      ["💰", "Transactions"],
+      ["👥", "Customers"],
+      ["📈", "Investments"],
+      ["⚠️", "Alerts"],
+    ],
+  },
 
-    finance: {
-      name: "Financial Services",
-      icon: "💰",
-    },
+  Entertainment: {
+    icon: "🎬",
+    menus: [
+      ["📊", "Overview"],
+      ["🎟️", "Bookings"],
+      ["👥", "Audience"],
+      ["🎥", "Content"],
+      ["⚠️", "Alerts"],
+    ],
+  },
+};
 
-    entertainment: {
-      name: "Entertainment",
-      icon: "🎬",
-    },
-  };
-
-  const currentSector =
-    sectorData[sector] || sectorData.retail;
-
-  const menuItems = [
-    {
-      path: "overview",
-      icon: "📊",
-      label: "Overview",
-    },
-    {
-      path: "sales",
-      icon: "🛒",
-      label: "Sales",
-    },
-    {
-      path: "inventory",
-      icon: "📦",
-      label: "Inventory",
-    },
-    {
-      path: "customers",
-      icon: "👥",
-      label: "Customers",
-    },
-    {
-      path: "analytics",
-      icon: "📈",
-      label: "Analytics",
-    },
-    {
-      path: "alerts",
-      icon: "⚠️",
-      label: "Alerts",
-    },
-  ];
-
-  const handleLogout = () => {
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userSector");
-
-    navigate("/login");
-  };
+function Sidebar({ sector, setPage }) {
+  const data = sectorData[sector] || sectorData.Retail;
 
   return (
     <aside className="sidebar">
 
       {/* LOGO */}
-
-      <div className="sidebar-logo">
-
-        <div className="logo-box">
-          S
-        </div>
-
-        <h2>
-          SectorSense
-        </h2>
-
-      </div>
-
-
-      {/* CURRENT SECTOR */}
-
-      <div className="sector-box">
-
-        <span className="sector-icon">
-          {currentSector.icon}
-        </span>
+      <div className="logo">
+        <div className="logo-box">S</div>
 
         <div>
-          <small>Current Sector</small>
-
-          <strong>
-            {currentSector.name}
-          </strong>
+          <h2>SectorSense</h2>
+          <p>BUSINESS INTELLIGENCE</p>
         </div>
-
       </div>
 
+      {/* CURRENT SECTOR */}
+      <div className="active-sector">
+        <span>ACTIVE SECTOR</span>
 
-      {/* NAVIGATION */}
+        <h3>
+          {data.icon} {sector}
+        </h3>
+      </div>
 
-      <nav className="sidebar-nav">
+      {/* MENU */}
+      <nav className="sidebar-menu">
 
-        <p className="nav-title">
-          MAIN MENU
-        </p>
-
-        {menuItems.map((item) => (
-
-          <NavLink
-            key={item.path}
-            to={`/dashboard/${sector}/${item.path}`}
-            className={({ isActive }) =>
-              `sidebar-link ${
-                isActive ? "active" : ""
-              }`
-            }
+        {data.menus.map(([icon, name]) => (
+          <button
+            key={name}
+            onClick={() => setPage(name)}
           >
-
-            <span className="sidebar-icon">
-              {item.icon}
-            </span>
-
-            <span>
-              {item.label}
-            </span>
-
-          </NavLink>
-
+            <span>{icon}</span>
+            {name}
+          </button>
         ))}
 
       </nav>
 
-
-      {/* BOTTOM */}
-
-      <div className="sidebar-bottom">
-
-        <NavLink
-          to={`/dashboard/${sector}/settings`}
-          className={({ isActive }) =>
-            `sidebar-link ${
-              isActive ? "active" : ""
-            }`
-          }
-        >
-
-          <span className="sidebar-icon">
-            ⚙️
-          </span>
-
-          <span>
-            Settings
-          </span>
-
-        </NavLink>
-
-
-        <button
-          className="sidebar-link logout-button"
-          onClick={handleLogout}
-        >
-
-          <span className="sidebar-icon">
-            🚪
-          </span>
-
-          <span>
-            Logout
-          </span>
-
-        </button>
-
-      </div>
+      {/* LOGOUT */}
+      <button
+        className="logout-btn"
+        onClick={() => window.location.reload()}
+      >
+        🚪 Logout
+      </button>
 
     </aside>
   );
