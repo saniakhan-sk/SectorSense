@@ -761,6 +761,232 @@ function App() {
           </div>
 
         </section>
+                {/* =====================================================
+            ADDITIONAL SECTOR ANALYTICS
+            This is an ADD-ON only.
+            Existing dashboard functionality is untouched.
+        ===================================================== */}
+
+        <section className="sector-analytics">
+
+          <div className="analytics-header">
+            <div>
+              <span className="eyebrow">PERFORMANCE OVERVIEW</span>
+
+              <h2>Sector Analytics</h2>
+
+              <p>
+                Compare business performance across all sectors.
+              </p>
+            </div>
+
+            <span className="analytics-live">
+              ● LIVE DATA
+            </span>
+          </div>
+
+          <div className="analytics-grid">
+
+            {/* REVENUE BAR CHART */}
+            <div className="analytics-card">
+
+              <div className="analytics-card-header">
+                <div>
+                  <span className="analytics-label">
+                    REVENUE
+                  </span>
+
+                  <h3>Revenue by Sector</h3>
+                </div>
+
+                <span className="analytics-icon">
+                  ₹
+                </span>
+              </div>
+
+              <div className="bar-chart">
+
+                {Object.entries(sectorData).map(
+                  ([name, item]) => {
+
+                    const revenue = item.fields.find(
+                      (field) => field.name === "sales"
+                    )?.value || 0;
+
+                    const maxRevenue = 280000;
+
+                    const percentage =
+                      (revenue / maxRevenue) * 100;
+
+                    return (
+                      <div
+                        className="bar-row"
+                        key={name}
+                      >
+
+                        <div className="bar-info">
+                          <span>
+                            {item.icon} {name}
+                          </span>
+
+                          <strong>
+                            ₹{revenue.toLocaleString()}
+                          </strong>
+                        </div>
+
+                        <div className="bar-track">
+                          <div
+                            className="bar-fill"
+                            style={{
+                              width: `${percentage}%`
+                            }}
+                          />
+                        </div>
+
+                      </div>
+                    );
+                  }
+                )}
+
+              </div>
+
+            </div>
+
+
+            {/* CUSTOMER / AUDIENCE BAR CHART */}
+            <div className="analytics-card">
+
+              <div className="analytics-card-header">
+                <div>
+                  <span className="analytics-label">
+                    CUSTOMER ACTIVITY
+                  </span>
+
+                  <h3>Customer Reach</h3>
+                </div>
+
+                <span className="analytics-icon">
+                  👥
+                </span>
+              </div>
+
+              <div className="bar-chart">
+
+                {Object.entries(sectorData).map(
+                  ([name, item]) => {
+
+                    const customers =
+                      item.fields.find(
+                        (field) =>
+                          field.name === "customers"
+                      )?.value || 0;
+
+                    const maxCustomers = 3200;
+
+                    const percentage =
+                      (customers / maxCustomers) * 100;
+
+                    return (
+                      <div
+                        className="bar-row"
+                        key={name}
+                      >
+
+                        <div className="bar-info">
+                          <span>
+                            {item.icon} {name}
+                          </span>
+
+                          <strong>
+                            {customers.toLocaleString()}
+                          </strong>
+                        </div>
+
+                        <div className="bar-track">
+                          <div
+                            className="bar-fill customer-bar"
+                            style={{
+                              width: `${percentage}%`
+                            }}
+                          />
+                        </div>
+
+                      </div>
+                    );
+                  }
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* QUICK SECTOR SUMMARY */}
+
+          <div className="sector-summary">
+
+            <div className="summary-heading">
+              <div>
+                <span className="analytics-label">
+                  SECTOR SNAPSHOT
+                </span>
+
+                <h3>Business Performance</h3>
+              </div>
+            </div>
+
+            <div className="summary-grid">
+
+              {Object.entries(sectorData).map(
+                ([name, item]) => {
+
+                  const revenue =
+                    item.fields.find(
+                      (field) => field.name === "sales"
+                    )?.value || 0;
+
+                  const customers =
+                    item.fields.find(
+                      (field) =>
+                        field.name === "customers"
+                    )?.value || 0;
+
+                  return (
+                    <div
+                      className="sector-summary-card"
+                      key={name}
+                    >
+
+                      <div className="summary-icon">
+                        {item.icon}
+                      </div>
+
+                      <div>
+                        <span>
+                          {name}
+                        </span>
+
+                        <strong>
+                          ₹{revenue.toLocaleString()}
+                        </strong>
+
+                        <small>
+                          {customers.toLocaleString()} customers
+                        </small>
+                      </div>
+
+                    </div>
+                  );
+                }
+              )}
+
+            </div>
+
+          </div>
+
+        </section>
 
       </main>
 
