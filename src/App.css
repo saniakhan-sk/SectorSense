@@ -1993,3 +1993,240 @@ nav {
   }
 
 }
+/* ============================================================
+   REALISTIC BUSINESS STATUS COLORS
+============================================================ */
+
+.result-status,
+.recommendation,
+.analytics-card,
+.stat-card,
+.sector-summary-card {
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+
+/* ============================================================
+   POSITIVE / HEALTHY STATUS
+============================================================ */
+
+.status-positive {
+  color: #15803d;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.status-positive strong {
+  color: #15803d;
+}
+
+
+/* ============================================================
+   NEGATIVE / ATTENTION STATUS
+============================================================ */
+
+.status-negative {
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.status-negative strong {
+  color: #dc2626;
+}
+
+
+/* ============================================================
+   WARNING STATUS
+============================================================ */
+
+.status-warning {
+  color: #b45309;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.status-warning strong {
+  color: #b45309;
+}
+
+
+/* ============================================================
+   STATUS DOTS
+============================================================ */
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 7px;
+}
+
+.status-dot-positive {
+  background: #16a34a;
+}
+
+.status-dot-negative {
+  background: #dc2626;
+}
+
+.status-dot-warning {
+  background: #f59e0b;
+}
+
+
+/* ============================================================
+   NEGATIVE RESULT CARD
+============================================================ */
+
+.result-card.negative-result {
+  border-color: #fecaca;
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.08);
+}
+
+
+/* ============================================================
+   POSITIVE RESULT CARD
+============================================================ */
+
+.result-card.positive-result {
+  border-color: #bbf7d0;
+  box-shadow: 0 8px 25px rgba(22, 163, 74, 0.07);
+}
+
+
+/* ============================================================
+   WARNING RESULT CARD
+============================================================ */
+
+.result-card.warning-result {
+  border-color: #fde68a;
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.07);
+}
+
+
+/* ============================================================
+   HISTORY STATUS
+============================================================ */
+
+.history-positive {
+  color: #15803d !important;
+}
+
+.history-negative {
+  color: #dc2626 !important;
+}
+
+.history-warning {
+  color: #b45309 !important;
+}
+
+
+/* ============================================================
+   ALERT BAR
+============================================================ */
+
+.alert-bar {
+  background: #dc2626 !important;
+}
+
+.alert-bar-warning {
+  background: #f59e0b !important;
+}
+
+.alert-bar-positive {
+  background: #16a34a !important;
+}
+
+
+/* ============================================================
+   NEGATIVE KPI
+============================================================ */
+
+.stat-card.negative-kpi {
+  border-color: #fecaca;
+  background: #fffafa;
+}
+
+.stat-card.negative-kpi strong {
+  color: #dc2626;
+}
+
+
+/* ============================================================
+   WARNING KPI
+============================================================ */
+
+.stat-card.warning-kpi {
+  border-color: #fde68a;
+  background: #fffdf5;
+}
+
+.stat-card.warning-kpi strong {
+  color: #b45309;
+}
+
+
+/* ============================================================
+   POSITIVE KPI
+============================================================ */
+
+.stat-card.positive-kpi {
+  border-color: #bbf7d0;
+  background: #fbfffc;
+}
+
+.stat-card.positive-kpi strong {
+  color: #15803d;
+}
+
+
+/* ============================================================
+   REALISTIC ANALYTICS COLORS
+============================================================ */
+
+.bar-fill {
+  background: #2563eb;
+}
+
+.customer-bar {
+  background: #0f766e;
+}
+
+.alert-bar {
+  background: #dc2626;
+}
+
+
+/* ============================================================
+   LIVE INDICATOR
+============================================================ */
+
+.analytics-live {
+  color: #15803d;
+}
+
+.live-badge {
+  color: #15803d;
+}
+
+
+/* ============================================================
+   HISTORY CARDS
+============================================================ */
+
+.history-card-negative {
+  border-left: 4px solid #dc2626;
+}
+
+.history-card-positive {
+  border-left: 4px solid #16a34a;
+}
+
+.history-card-warning {
+  border-left: 4px solid #f59e0b;
+}

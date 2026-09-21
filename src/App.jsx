@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import "./App.css";
 
@@ -31,6 +32,7 @@ const sectorData = {
       if (data.alerts > 20) {
         return {
           status: "Attention Required",
+          type: "negative",
           message:
             "Inventory risk is high. Consider restocking low-stock products.",
           metric: `₹${average.toLocaleString()}`,
@@ -40,8 +42,22 @@ const sectorData = {
         };
       }
 
+      if (data.alerts > 12) {
+        return {
+          status: "Warning",
+          type: "warning",
+          message:
+            "Inventory levels need monitoring to avoid future stock shortages.",
+          metric: `₹${average.toLocaleString()}`,
+          metricLabel: "Sales / Customer",
+          recommendation:
+            "Monitor fast-moving products and plan inventory replenishment.",
+        };
+      }
+
       return {
         status: "Healthy",
+        type: "positive",
         message:
           "Retail performance is stable with healthy customer activity.",
         metric: `₹${average.toLocaleString()}`,
@@ -81,6 +97,7 @@ const sectorData = {
       if (data.alerts > 30) {
         return {
           status: "High Cancellation Rate",
+          type: "negative",
           message:
             "Guest cancellations are relatively high and may affect occupancy.",
           metric: `${occupancy}%`,
@@ -90,8 +107,22 @@ const sectorData = {
         };
       }
 
+      if (data.alerts > 20) {
+        return {
+          status: "Warning",
+          type: "warning",
+          message:
+            "Cancellation levels are increasing and should be monitored.",
+          metric: `${occupancy}%`,
+          metricLabel: "Booking Utilization",
+          recommendation:
+            "Analyze cancellation reasons and improve guest retention.",
+        };
+      }
+
       return {
         status: "Good Occupancy",
+        type: "positive",
         message:
           "Guest activity and booking levels are showing healthy performance.",
         metric: `${occupancy}%`,
@@ -131,6 +162,7 @@ const sectorData = {
       if (data.alerts > 50) {
         return {
           status: "Risk Monitoring Required",
+          type: "negative",
           message:
             "The number of risk alerts is elevated and requires monitoring.",
           metric: transactionsPerCustomer,
@@ -140,8 +172,22 @@ const sectorData = {
         };
       }
 
+      if (data.alerts > 30) {
+        return {
+          status: "Warning",
+          type: "warning",
+          message:
+            "Risk alerts are increasing and should be monitored closely.",
+          metric: transactionsPerCustomer,
+          metricLabel: "Transactions / Customer",
+          recommendation:
+            "Review unusual transactions and strengthen monitoring.",
+        };
+      }
+
       return {
         status: "Stable",
+        type: "positive",
         message:
           "Transaction activity is stable with manageable risk indicators.",
         metric: transactionsPerCustomer,
@@ -181,6 +227,7 @@ const sectorData = {
       if (data.alerts > 50) {
         return {
           status: "Audience Attention Needed",
+          type: "negative",
           message:
             "Cancellation levels are high and may affect audience engagement.",
           metric: `${bookingRate}%`,
@@ -190,8 +237,22 @@ const sectorData = {
         };
       }
 
+      if (data.alerts > 35) {
+        return {
+          status: "Warning",
+          type: "warning",
+          message:
+            "Cancellation levels are increasing and require monitoring.",
+          metric: `${bookingRate}%`,
+          metricLabel: "Booking Rate",
+          recommendation:
+            "Analyze audience behavior and improve engagement strategies.",
+        };
+      }
+
       return {
         status: "Strong Audience Activity",
+        type: "positive",
         message:
           "Audience engagement and booking activity are performing steadily.",
         metric: `${bookingRate}%`,
@@ -203,84 +264,260 @@ const sectorData = {
   },
 };
 
-function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+/* ============================================================
+   DEFAULT VALUES
+============================================================ */
 
-  // Retail is the default dashboard
-  const [sector, setSector] = useState("Retail");
+function getInitialSectorValues() {
+  return Object.fromEntries(
+    Object.entries(sectorData).map(([sectorName, sector]) => [
+      sectorName,
+      Object.fromEntries(
+        sector.fields.map((field) => [
+          field.name,
+          field.value,
+        ])
+      ),
+    ])
+  );
+}
+
+function App() {
+  /* ============================================================
+     LOGIN
+  ============================================================ */
+
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [data, setData] = useState(
-    Object.fromEntries(
-      sectorData.Retail.fields.map((field) => [
-        field.name,
-        field.value,
-      ])
-    )
+  /* ============================================================
+     CURRENT SECTOR
+  ============================================================ */
+
+  const [sector, setSector] = useState("Retail");
+
+  /* ============================================================
+     FORM VALUES
+  ============================================================ */
+
+  const [sectorValues, setSectorValues] = useState(
+    getInitialSectorValues()
   );
 
-  const [result, setResult] = useState(null);
+  /* ============================================================
+     ANALYZED VALUES
+  ============================================================ */
+
+  const [analyzedValues, setAnalyzedValues] = useState(
+    getInitialSectorValues()
+  );
+
+  /* ============================================================
+     RESULTS
+  ============================================================ */
+
+  const [sectorResults, setSectorResults] = useState({});
+
+  /* ============================================================
+     HISTORY
+  ============================================================ */
+
+  const [history, setHistory] = useState([]);
+
+  /* ============================================================
+     CURRENT DATA
+  ============================================================ */
 
   const currentSector = sectorData[sector];
 
-  // =========================
-  // LOGIN
-  // =========================
+  const data = sectorValues[sector];
+
+  const result = sectorResults[sector] || null;
+
+  /* ============================================================
+     STATUS HELPER
+  ============================================================ */
+
+  function getStatusType(result) {
+    if (!result) return "";
+
+    if (result.type) {
+      return result.type;
+    }
+
+    const status =
+      result.status.toLowerCase();
+
+    if (
+      status.includes("attention") ||
+      status.includes("high") ||
+      status.includes("risk") ||
+      status.includes("required") ||
+      status.includes("needed")
+    ) {
+      return "negative";
+    }
+
+    if (
+      status.includes("warning") ||
+      status.includes("moderate")
+    ) {
+      return "warning";
+    }
+
+    return "positive";
+  }
+
+  /* ============================================================
+     LOGIN
+  ============================================================ */
 
   function handleLogin(e) {
     e.preventDefault();
 
-    if (email && password) {
+    if (
+      email.trim() &&
+      password.trim()
+    ) {
       setLoggedIn(true);
     }
   }
 
-  // =========================
-  // SWITCH SECTOR
-  // =========================
-
-  function handleSectorChange(e) {
-    const newSector = e.target.value;
-
-    setSector(newSector);
-
-    const newData = Object.fromEntries(
-      sectorData[newSector].fields.map((field) => [
-        field.name,
-        field.value,
-      ])
-    );
-
-    setData(newData);
-    setResult(null);
-  }
-
-  // =========================
-  // INPUT CHANGE
-  // =========================
+  /* ============================================================
+     INPUT CHANGE
+  ============================================================ */
 
   function handleInputChange(e) {
-    setData({
-      ...data,
-      [e.target.name]: Number(e.target.value),
-    });
+    const { name, value } = e.target;
+
+    setSectorValues((previousValues) => ({
+      ...previousValues,
+
+      [sector]: {
+        ...previousValues[sector],
+
+        [name]: Number(value),
+      },
+    }));
   }
 
-  // =========================
-  // ANALYZE
-  // =========================
+  /* ============================================================
+     SWITCH SECTOR
+  ============================================================ */
+
+  function handleSectorChange(e) {
+    setSector(e.target.value);
+  }
+
+  /* ============================================================
+     ANALYZE BUSINESS
+  ============================================================ */
 
   function analyzeBusiness() {
-    const analysis = currentSector.analyze(data);
+    const analysis =
+      currentSector.analyze(data);
 
-    setResult(analysis);
+    /* Save analyzed values */
+
+    setAnalyzedValues(
+      (previousValues) => ({
+        ...previousValues,
+
+        [sector]: {
+          ...data,
+        },
+      })
+    );
+
+    /* Save result */
+
+    setSectorResults(
+      (previousResults) => ({
+        ...previousResults,
+
+        [sector]: analysis,
+      })
+    );
+
+    /* Add history */
+
+    const historyEntry = {
+      id: Date.now(),
+
+      sector,
+
+      icon: currentSector.icon,
+
+      timestamp:
+        new Date().toLocaleString(),
+
+      values: {
+        ...data,
+      },
+
+      status: analysis.status,
+
+      type: analysis.type,
+
+      metric: analysis.metric,
+
+      metricLabel:
+        analysis.metricLabel,
+    };
+
+    setHistory(
+      (previousHistory) => [
+        historyEntry,
+        ...previousHistory,
+      ]
+    );
   }
 
-  // =========================
-  // LOGIN PAGE
-  // =========================
+  /* ============================================================
+     CLEAR HISTORY
+  ============================================================ */
+
+  function clearHistory() {
+    setHistory([]);
+  }
+
+  /* ============================================================
+     ANALYTICS DATA
+  ============================================================ */
+
+  const analyticsData =
+    Object.fromEntries(
+      Object.entries(sectorData).map(
+        ([sectorName, sectorInfo]) => [
+          sectorName,
+
+          {
+            ...sectorInfo,
+
+            fields:
+              sectorInfo.fields.map(
+                (field) => ({
+                  ...field,
+
+                  value:
+                    analyzedValues[
+                      sectorName
+                    ]?.[
+                      field.name
+                    ] ??
+                    field.value,
+                })
+              ),
+          },
+        ]
+      )
+    );
+
+  /* ============================================================
+     LOGIN PAGE
+  ============================================================ */
 
   if (!loggedIn) {
     return (
@@ -295,8 +532,13 @@ function App() {
             </div>
 
             <div>
-              <h2>SectorSense</h2>
-              <p>SMART BUSINESS INTELLIGENCE</p>
+              <h2>
+                SectorSense
+              </h2>
+
+              <p>
+                SMART BUSINESS INTELLIGENCE
+              </p>
             </div>
 
           </div>
@@ -314,21 +556,32 @@ function App() {
             </h1>
 
             <p>
-              Turn your business data into meaningful insights,
-              performance indicators and actionable decisions.
+              Turn your business data
+              into meaningful insights,
+              performance indicators
+              and actionable decisions.
             </p>
 
             <div className="sector-preview">
 
-              {Object.entries(sectorData).map(
+              {Object.entries(
+                sectorData
+              ).map(
                 ([name, item]) => (
+
                   <div
                     className="sector-item"
                     key={name}
                   >
-                    <span>{item.icon}</span>
+
+                    <span>
+                      {item.icon}
+                    </span>
+
                     {name}
+
                   </div>
+
                 )
               )}
 
@@ -355,10 +608,13 @@ function App() {
             </h2>
 
             <p className="login-subtitle">
-              Access your business intelligence dashboard.
+              Access your business
+              intelligence dashboard.
             </p>
 
-            <form onSubmit={handleLogin}>
+            <form
+              onSubmit={handleLogin}
+            >
 
               <label>
                 Email address
@@ -369,7 +625,9 @@ function App() {
                 placeholder="you@company.com"
                 value={email}
                 onChange={(e) =>
-                  setEmail(e.target.value)
+                  setEmail(
+                    e.target.value
+                  )
                 }
                 required
               />
@@ -383,7 +641,9 @@ function App() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) =>
-                  setPassword(e.target.value)
+                  setPassword(
+                    e.target.value
+                  )
                 }
                 required
               />
@@ -409,9 +669,9 @@ function App() {
     );
   }
 
-  // =========================
-  // DASHBOARD
-  // =========================
+  /* ============================================================
+     DASHBOARD
+  ============================================================ */
 
   return (
     <div className="app">
@@ -427,7 +687,10 @@ function App() {
           </div>
 
           <div>
-            <h2>SectorSense</h2>
+            <h2>
+              SectorSense
+            </h2>
+
             <span>
               BUSINESS INTELLIGENCE
             </span>
@@ -442,7 +705,8 @@ function App() {
           </span>
 
           <strong>
-            {currentSector.icon} {sector}
+            {currentSector.icon}{" "}
+            {sector}
           </strong>
 
         </div>
@@ -508,8 +772,6 @@ function App() {
 
           </div>
 
-          {/* SECTOR SWITCH */}
-
           <div className="sector-switch">
 
             <label>
@@ -518,17 +780,24 @@ function App() {
 
             <select
               value={sector}
-              onChange={handleSectorChange}
+              onChange={
+                handleSectorChange
+              }
             >
 
-              {Object.keys(sectorData).map(
+              {Object.keys(
+                sectorData
+              ).map(
                 (name) => (
+
                   <option
                     key={name}
                     value={name}
                   >
-                    {sectorData[name].icon} {name}
+                    {sectorData[name].icon}{" "}
+                    {name}
                   </option>
+
                 )
               )}
 
@@ -538,46 +807,127 @@ function App() {
 
         </header>
 
-        {/* =========================
+        {/* ======================================================
             KPI CARDS
-        ========================= */}
+        ====================================================== */}
 
         <section className="stats">
 
           {currentSector.kpis.map(
-            ([label, value]) => (
+            ([label, defaultValue]) => {
 
-              <div
-                className="stat-card"
-                key={label}
-              >
+              let updatedValue =
+                defaultValue;
 
-                <span>
-                  {label}
-                </span>
+              let kpiClass =
+                "";
 
-                <strong>
-                  {value}
-                </strong>
+              /* Revenue */
 
-                <small>
-                  Current period
-                </small>
+              if (
+                label ===
+                "Revenue"
+              ) {
+                updatedValue =
+                  `₹${analyzedValues[sector].sales.toLocaleString()}`;
+              }
 
-              </div>
+              /* Customers */
 
-            )
+              if (
+                label ===
+                  "Customers" ||
+                label ===
+                  "Guests" ||
+                label ===
+                  "Viewers"
+              ) {
+                updatedValue =
+                  analyzedValues[
+                    sector
+                  ].customers.toLocaleString();
+              }
+
+              /* Products */
+
+              if (
+                label ===
+                  "Products" ||
+                label ===
+                  "Bookings" ||
+                label ===
+                  "Transactions"
+              ) {
+                updatedValue =
+                  analyzedValues[
+                    sector
+                  ].products.toLocaleString();
+              }
+
+              /* Alerts */
+
+              if (
+                label ===
+                  "Low Stock" ||
+                label ===
+                  "Cancellations" ||
+                label ===
+                  "Risk Alerts"
+              ) {
+                updatedValue =
+                  analyzedValues[
+                    sector
+                  ].alerts.toLocaleString();
+
+                if (
+                  result &&
+                  result.type ===
+                    "negative"
+                ) {
+                  kpiClass =
+                    "negative-kpi";
+                } else if (
+                  result &&
+                  result.type ===
+                    "warning"
+                ) {
+                  kpiClass =
+                    "warning-kpi";
+                }
+              }
+
+              return (
+                <div
+                  className={`stat-card ${kpiClass}`}
+                  key={label}
+                >
+
+                  <span>
+                    {label}
+                  </span>
+
+                  <strong>
+                    {updatedValue}
+                  </strong>
+
+                  <small>
+                    Current period
+                  </small>
+
+                </div>
+              );
+            }
           )}
 
         </section>
 
-        {/* =========================
-            CONTENT
-        ========================= */}
+        {/* ======================================================
+            ANALYSIS SECTION
+        ====================================================== */}
 
         <section className="content-grid">
 
-          {/* DATA INPUT */}
+          {/* ANALYZE */}
 
           <div className="analysis-card">
 
@@ -602,11 +952,10 @@ function App() {
             </div>
 
             <p className="card-description">
-
               Enter your current{" "}
-              {sector.toLowerCase()} data to
-              generate meaningful insights.
-
+              {sector.toLowerCase()}
+              {" "}data to generate
+              meaningful insights.
             </p>
 
             <div className="form-grid">
@@ -626,8 +975,14 @@ function App() {
                     <input
                       type="number"
                       name={field.name}
-                      value={data[field.name]}
-                      onChange={handleInputChange}
+                      value={
+                        data[
+                          field.name
+                        ]
+                      }
+                      onChange={
+                        handleInputChange
+                      }
                       min="0"
                     />
 
@@ -640,18 +995,28 @@ function App() {
 
             <button
               className="analyze-button"
-              onClick={analyzeBusiness}
+              onClick={
+                analyzeBusiness
+              }
             >
               Analyze Business →
             </button>
 
           </div>
 
-          {/* =========================
-              RESULT
-          ========================= */}
+          {/* ====================================================
+              BUSINESS INSIGHT
+          ==================================================== */}
 
-          <div className="result-card">
+          <div
+            className={`result-card ${
+              result
+                ? `${getStatusType(
+                    result
+                  )}-result`
+                : ""
+            }`}
+          >
 
             <span className="eyebrow">
               BUSINESS INSIGHT
@@ -674,10 +1039,15 @@ function App() {
                 </h3>
 
                 <p>
-                  Enter your {sector.toLowerCase()}{" "}
-                  information and click{" "}
-                  <b>Analyze Business</b>{" "}
-                  to generate insights.
+                  Enter your{" "}
+                  {sector.toLowerCase()}
+                  {" "}information and
+                  click{" "}
+                  <b>
+                    Analyze Business
+                  </b>{" "}
+                  to generate
+                  insights.
                 </p>
 
               </div>
@@ -686,9 +1056,19 @@ function App() {
 
               <div className="result-content">
 
-                <div className="result-status">
+                <div
+                  className={`result-status status-${getStatusType(
+                    result
+                  )}`}
+                >
 
                   <span>
+                    <span
+                      className={`status-dot status-dot-${getStatusType(
+                        result
+                      )}`}
+                    />
+
                     STATUS
                   </span>
 
@@ -761,62 +1141,100 @@ function App() {
           </div>
 
         </section>
-                {/* =====================================================
-            ADDITIONAL SECTOR ANALYTICS
-            This is an ADD-ON only.
-            Existing dashboard functionality is untouched.
-        ===================================================== */}
+
+        {/* ======================================================
+            SECTOR ANALYTICS
+        ====================================================== */}
 
         <section className="sector-analytics">
 
           <div className="analytics-header">
-            <div>
-              <span className="eyebrow">PERFORMANCE OVERVIEW</span>
 
-              <h2>Sector Analytics</h2>
+            <div>
+
+              <span className="eyebrow">
+                PERFORMANCE OVERVIEW
+              </span>
+
+              <h2>
+                Sector Analytics
+              </h2>
 
               <p>
-                Compare business performance across all sectors.
+                Compare business
+                performance across
+                all sectors.
               </p>
+
             </div>
 
             <span className="analytics-live">
               ● LIVE DATA
             </span>
+
           </div>
 
           <div className="analytics-grid">
 
-            {/* REVENUE BAR CHART */}
+            {/* REVENUE */}
+
             <div className="analytics-card">
 
               <div className="analytics-card-header">
+
                 <div>
+
                   <span className="analytics-label">
                     REVENUE
                   </span>
 
-                  <h3>Revenue by Sector</h3>
+                  <h3>
+                    Revenue by Sector
+                  </h3>
+
                 </div>
 
                 <span className="analytics-icon">
                   ₹
                 </span>
+
               </div>
 
               <div className="bar-chart">
 
-                {Object.entries(sectorData).map(
+                {Object.entries(
+                  analyticsData
+                ).map(
                   ([name, item]) => {
 
-                    const revenue = item.fields.find(
-                      (field) => field.name === "sales"
-                    )?.value || 0;
+                    const revenue =
+                      item.fields.find(
+                        (field) =>
+                          field.name ===
+                          "sales"
+                      )?.value || 0;
 
-                    const maxRevenue = 280000;
+                    const maxRevenue =
+                      Math.max(
+                        280000,
+                        ...Object.values(
+                          analyticsData
+                        ).map(
+                          (sectorItem) =>
+                            sectorItem.fields.find(
+                              (field) =>
+                                field.name ===
+                                "sales"
+                            )?.value || 0
+                        )
+                      );
 
                     const percentage =
-                      (revenue / maxRevenue) * 100;
+                      maxRevenue > 0
+                        ? (revenue /
+                            maxRevenue) *
+                          100
+                        : 0;
 
                     return (
                       <div
@@ -825,22 +1243,29 @@ function App() {
                       >
 
                         <div className="bar-info">
+
                           <span>
-                            {item.icon} {name}
+                            {item.icon}{" "}
+                            {name}
                           </span>
 
                           <strong>
-                            ₹{revenue.toLocaleString()}
+                            ₹
+                            {revenue.toLocaleString()}
                           </strong>
+
                         </div>
 
                         <div className="bar-track">
+
                           <div
                             className="bar-fill"
                             style={{
-                              width: `${percentage}%`
+                              width:
+                                `${percentage}%`,
                             }}
                           />
+
                         </div>
 
                       </div>
@@ -852,39 +1277,65 @@ function App() {
 
             </div>
 
+            {/* CUSTOMERS */}
 
-            {/* CUSTOMER / AUDIENCE BAR CHART */}
             <div className="analytics-card">
 
               <div className="analytics-card-header">
+
                 <div>
+
                   <span className="analytics-label">
                     CUSTOMER ACTIVITY
                   </span>
 
-                  <h3>Customer Reach</h3>
+                  <h3>
+                    Customer Reach
+                  </h3>
+
                 </div>
 
                 <span className="analytics-icon">
                   👥
                 </span>
+
               </div>
 
               <div className="bar-chart">
 
-                {Object.entries(sectorData).map(
+                {Object.entries(
+                  analyticsData
+                ).map(
                   ([name, item]) => {
 
                     const customers =
                       item.fields.find(
                         (field) =>
-                          field.name === "customers"
+                          field.name ===
+                          "customers"
                       )?.value || 0;
 
-                    const maxCustomers = 3200;
+                    const maxCustomers =
+                      Math.max(
+                        3200,
+                        ...Object.values(
+                          analyticsData
+                        ).map(
+                          (sectorItem) =>
+                            sectorItem.fields.find(
+                              (field) =>
+                                field.name ===
+                                "customers"
+                            )?.value || 0
+                        )
+                      );
 
                     const percentage =
-                      (customers / maxCustomers) * 100;
+                      maxCustomers > 0
+                        ? (customers /
+                            maxCustomers) *
+                          100
+                        : 0;
 
                     return (
                       <div
@@ -893,22 +1344,163 @@ function App() {
                       >
 
                         <div className="bar-info">
+
                           <span>
-                            {item.icon} {name}
+                            {item.icon}{" "}
+                            {name}
                           </span>
 
                           <strong>
                             {customers.toLocaleString()}
                           </strong>
+
                         </div>
 
                         <div className="bar-track">
+
                           <div
                             className="bar-fill customer-bar"
                             style={{
-                              width: `${percentage}%`
+                              width:
+                                `${percentage}%`,
                             }}
                           />
+
+                        </div>
+
+                      </div>
+                    );
+                  }
+                )}
+
+              </div>
+
+            </div>
+
+            {/* ALERTS */}
+
+            <div className="analytics-card">
+
+              <div className="analytics-card-header">
+
+                <div>
+
+                  <span className="analytics-label">
+                    ALERTS & ACTIVITY
+                  </span>
+
+                  <h3>
+                    Alerts / Cancellations
+                  </h3>
+
+                </div>
+
+                <span className="analytics-icon">
+                  ⚠
+                </span>
+
+              </div>
+
+              <div className="bar-chart">
+
+                {Object.entries(
+                  analyticsData
+                ).map(
+                  ([name, item]) => {
+
+                    const alerts =
+                      item.fields.find(
+                        (field) =>
+                          field.name ===
+                          "alerts"
+                      )?.value || 0;
+
+                    const maxAlerts =
+                      Math.max(
+                        50,
+                        ...Object.values(
+                          analyticsData
+                        ).map(
+                          (sectorItem) =>
+                            sectorItem.fields.find(
+                              (field) =>
+                                field.name ===
+                                "alerts"
+                            )?.value || 0
+                        )
+                      );
+
+                    const percentage =
+                      maxAlerts > 0
+                        ? (alerts /
+                            maxAlerts) *
+                          100
+                        : 0;
+
+                    const sectorResult =
+                      sectorResults[
+                        name
+                      ];
+
+                    let alertClass =
+                      "bar-fill";
+
+                    if (
+                      sectorResult?.type ===
+                      "negative"
+                    ) {
+                      alertClass =
+                        "bar-fill alert-bar";
+                    } else if (
+                      sectorResult?.type ===
+                      "warning"
+                    ) {
+                      alertClass =
+                        "bar-fill alert-bar-warning";
+                    }
+
+                    return (
+                      <div
+                        className="bar-row"
+                        key={name}
+                      >
+
+                        <div className="bar-info">
+
+                          <span>
+                            {item.icon}{" "}
+                            {name}
+                          </span>
+
+                          <strong
+                            style={{
+                              color:
+                                sectorResult?.type ===
+                                "negative"
+                                  ? "#dc2626"
+                                  : sectorResult?.type ===
+                                    "warning"
+                                  ? "#b45309"
+                                  : "#475569",
+                            }}
+                          >
+                            {alerts.toLocaleString()}
+                          </strong>
+
+                        </div>
+
+                        <div className="bar-track">
+
+                          <div
+                            className={
+                              alertClass
+                            }
+                            style={{
+                              width:
+                                `${percentage}%`,
+                            }}
+                          />
+
                         </div>
 
                       </div>
@@ -922,40 +1514,70 @@ function App() {
 
           </div>
 
-
-          {/* QUICK SECTOR SUMMARY */}
+          {/* ====================================================
+              SECTOR SNAPSHOT
+          ==================================================== */}
 
           <div className="sector-summary">
 
             <div className="summary-heading">
+
               <div>
+
                 <span className="analytics-label">
                   SECTOR SNAPSHOT
                 </span>
 
-                <h3>Business Performance</h3>
+                <h3>
+                  Business Performance
+                </h3>
+
               </div>
+
             </div>
 
             <div className="summary-grid">
 
-              {Object.entries(sectorData).map(
+              {Object.entries(
+                analyticsData
+              ).map(
                 ([name, item]) => {
 
                   const revenue =
                     item.fields.find(
-                      (field) => field.name === "sales"
+                      (field) =>
+                        field.name ===
+                        "sales"
                     )?.value || 0;
 
                   const customers =
                     item.fields.find(
                       (field) =>
-                        field.name === "customers"
+                        field.name ===
+                        "customers"
                     )?.value || 0;
+
+                  const alerts =
+                    item.fields.find(
+                      (field) =>
+                        field.name ===
+                        "alerts"
+                    )?.value || 0;
+
+                  const sectorResult =
+                    sectorResults[
+                      name
+                    ];
 
                   return (
                     <div
-                      className="sector-summary-card"
+                      className={`sector-summary-card ${
+                        sectorResult
+                          ? `history-card-${getStatusType(
+                              sectorResult
+                            )}`
+                          : ""
+                      }`}
                       key={name}
                     >
 
@@ -964,17 +1586,44 @@ function App() {
                       </div>
 
                       <div>
+
                         <span>
                           {name}
                         </span>
 
                         <strong>
-                          ₹{revenue.toLocaleString()}
+                          ₹
+                          {revenue.toLocaleString()}
                         </strong>
 
                         <small>
-                          {customers.toLocaleString()} customers
+                          {customers.toLocaleString()}
+                          {" "}customers
                         </small>
+
+                        <small
+                          style={{
+                            color:
+                              sectorResult?.type ===
+                              "negative"
+                                ? "#dc2626"
+                                : sectorResult?.type ===
+                                  "warning"
+                                ? "#b45309"
+                                : "#64748b",
+                          }}
+                        >
+                          {alerts.toLocaleString()}
+                          {" "}
+                          {name ===
+                            "Retail"
+                            ? "low stock"
+                            : name ===
+                              "Financial Services"
+                            ? "risk alerts"
+                            : "cancellations"}
+                        </small>
+
                       </div>
 
                     </div>
@@ -988,6 +1637,163 @@ function App() {
 
         </section>
 
+        {/* ======================================================
+            HISTORY
+        ====================================================== */}
+
+        <section className="sector-summary">
+
+          <div className="summary-heading">
+
+            <div>
+
+              <span className="analytics-label">
+                ANALYSIS HISTORY
+              </span>
+
+              <h3>
+                Recent Business Analyses
+              </h3>
+
+            </div>
+
+            {history.length > 0 && (
+
+              <button
+                className="analyze-button"
+                onClick={
+                  clearHistory
+                }
+                style={{
+                  width: "auto",
+                  padding:
+                    "10px 18px",
+                  marginTop: "0",
+                }}
+              >
+                Clear History
+              </button>
+
+            )}
+
+          </div>
+
+          {history.length === 0 ? (
+
+            <div
+              className="empty-result"
+              style={{
+                padding: "30px",
+              }}
+            >
+
+              <div className="result-icon">
+                🕘
+              </div>
+
+              <h3>
+                No analysis history yet
+              </h3>
+
+              <p>
+                Your completed
+                business analyses
+                will appear here.
+              </p>
+
+            </div>
+
+          ) : (
+
+            <div className="summary-grid">
+
+              {history.map(
+                (entry) => (
+
+                  <div
+                    className={`sector-summary-card history-card-${entry.type}`}
+                    key={entry.id}
+                    style={{
+                      alignItems:
+                        "flex-start",
+                    }}
+                  >
+
+                    <div className="summary-icon">
+                      {entry.icon}
+                    </div>
+
+                    <div
+                      style={{
+                        width:
+                          "100%",
+                      }}
+                    >
+
+                      <span>
+                        {entry.sector}
+                      </span>
+
+                      <strong
+                        className={`history-${entry.type}`}
+                      >
+                        {entry.status}
+                      </strong>
+
+                      <small>
+                        {entry.metricLabel}:{" "}
+                        {entry.metric}
+                      </small>
+
+                      <small>
+                        Revenue: ₹
+                        {entry.values.sales.toLocaleString()}
+                      </small>
+
+                      <small>
+                        Customers:{" "}
+                        {entry.values.customers.toLocaleString()}
+                      </small>
+
+                      <small>
+                        Products /
+                        Bookings:{" "}
+                        {entry.values.products.toLocaleString()}
+                      </small>
+
+                      <small
+                        className={
+                          entry.type ===
+                          "negative"
+                            ? "history-negative"
+                            : entry.type ===
+                              "warning"
+                            ? "history-warning"
+                            : "history-positive"
+                        }
+                      >
+                        Alerts /
+                        Cancellations:{" "}
+                        {entry.values.alerts.toLocaleString()}
+                      </small>
+
+                      <small>
+                        {entry.timestamp}
+                      </small>
+
+                    </div>
+
+                  </div>
+
+                )
+              )}
+
+            </div>
+
+          )}
+
+        </section>
+
       </main>
 
     </div>
@@ -995,3 +1801,4 @@ function App() {
 }
 
 export default App;
+
